@@ -2,9 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Helpers\ParseHelper;
+use App\Models\Post;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Storage;
 
 class ParseNews extends Command
 {
@@ -16,6 +17,7 @@ class ParseNews extends Command
     protected $signature = 'parse:news';
     protected $client;
     protected $url = 'http://static.feed.rbc.ru/rbc/logical/footer/news.rss';
+    protected $method = 'GET';
 
     /**
      * The console command description.
@@ -42,36 +44,17 @@ class ParseNews extends Command
      */
     public function handle()
     {
-        $response = $this->client->get($this->url, [
+        $response = $this->client->request($this->method,$this->url, [
             'headers' => [
                 'Accept' => 'application/xml'
             ]
         ]);
         $body = $response->getBody()->getContents();
 
-        $doc = new \DOMDocument();
-
-        $doc->loadXML($body);
-        $items = $doc->getElementsByTagName('item');
-        $data = [];
-        foreach ($items as $item){
-            $post = new \stdClass();
-            $post->title = $item->getElementsByTagName('title')->item(0)->textContent;
-            $post->link = $item->getElementsByTagName('link')->item(0)->textContent;
-            $post->description = $item->getElementsByTagName('description')->item(0)->textContent;
-            $post->author = $item->getElementsByTagName('author')->length ? $item->getElementsByTagName('author')->item(0)->textContent : null;
-            $post->guid = $item->getElementsByTagName('guid')->item(0)->textContent;
-            $post->pubDate = date('Y-m-d H:i:s',strtotime($item->getElementsByTagName('pubDate')->item(0)->textContent));
-            if ($item->getElementsByTagName('enclosure')->length){
-                foreach ($item->getElementsByTagName('enclosure') as $img){
-                    $post->files[] = $img->getAttribute('url');
-                }
-            }
-            $data[] = $post;
+        ParseHelper::create_logs('GET',$this->url,$response);
+        if ($response->getReasonPhrase() == 'OK' && $response->getStatusCode() == 200){
+            ParseHelper::parse_news($body);
         }
-        Storage::put('/public/news/news.json',json_encode($data,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE));
 
-
-        return 0;
     }
 }

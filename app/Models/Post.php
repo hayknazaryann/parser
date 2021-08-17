@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class News extends Model
+class Post extends Model
 {
     use HasFactory;
-    protected $table = 'news';
+    protected $table = 'posts';
+    public $timestamps = false;
     public function files(){
-        return $this->hasMany(File::class);
+        return $this->hasMany(PostFile::class);
     }
 }

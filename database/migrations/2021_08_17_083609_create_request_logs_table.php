@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNewsFilesTable extends Migration
+class CreateRequestLogsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,13 @@ class CreateNewsFilesTable extends Migration
      */
     public function up()
     {
-        Schema::create('news_files', function (Blueprint $table) {
+        Schema::create('request_logs', function (Blueprint $table) {
             $table->id();
-            $table->integer('news_id');
-            $table->text('file_link');
-            $table->foreign('news_id')->references('id')->on('news')->onDelete('cascade');
-            $table->timestamps();
+            $table->string('method');
+            $table->string('url');
+            $table->string('response_code');
+            $table->longText('response_body');
+            $table->dateTime('request_date');
         });
     }
 
@@ -29,6 +30,6 @@ class CreateNewsFilesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('news_files');
+        Schema::dropIfExists('request_logs');
     }
 }

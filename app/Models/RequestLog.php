@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class File extends Model
+class RequestLog extends Model
 {
     use HasFactory;
-    protected $table = 'news_files';
-
+    protected $table = 'request_logs';
+    public $timestamps = false;
 }
