@@ -40,10 +40,7 @@ class ParseHelper
         }
     }
 
-    public static function create_logs($method,$url,$response){
-        $response_code = $response->getStatusCode();
-        $body = $response->getBody()->getContents();
-        $date = $response->getHeader('Date')[0];
+    public static function create_logs($method,$url,$response_code,$body,$date){
         $log = new RequestLog();
         $log->method = $method;
         $log->url = $url;
